@@ -21,8 +21,8 @@ const initializeDbAndServer = async () => {
             filename: dbpath,
             driver: sqlite3.Database,
         });
-        app.listen(3001, () => {
-            console.log("Server started on port 3001");
+        app.listen(3002, () => {
+            console.log("Server started on port 3002");
         });
     } catch (e) {
         console.error("DB Error:", e.message);
@@ -50,17 +50,14 @@ app.get("/table", async (request, response) => {
     }
 });
 app.get("/ptable",async(request,response)=>{
-    const query=`CREATE TABLE products(
-        productid VARCHAR(250),
-        productname VARCHAR(250),
-        productimg VARCHAR(250),
-        productprice int,
-        productdescription VARCHAR(1000),
-        productbrand VARCHAR(250)
+    const query=`CREATE TABLE blogs(
+        blogtid VARCHAR(250),
+        blogname VARCHAR(250),
+        blogdescription VARCHAR(1000)
     )`
     try{
         await db.run(query);
-        response.send("created product table")
+        response.send("created blog table")
     }catch (error){
         console.log(error)
         response.send("internal server error")
@@ -114,35 +111,32 @@ app.post("/login/", async (request, response) => {
     }
 });
 
-app.get("/products/", async (request, response) => {
+app.get("/blogs/", async (request, response) => {
     
     try {
        
         
-        const query=`SELECT * from products`
+        const query=`SELECT * from blogs`
         const data=await db.all(query)
         response.send({data})
         response.status(200)
-        // Add logic to fetch products
+        // Add logic to fetch pblogs
         //response.send("Products will be fetched here");
     } catch (error) {
         console.error("Error verifying token:", error);
         response.status(401).send("Unauthorized");
     }
 });
-app.post("/createproduct",async(request,response)=>{
-    const{productid,productname,productimg,productdescription,productprice,productbrand}=request.body
-    const query=`INSERT INTO products(
-        productid,
-        productname,
-        productimg,
-        productprice,
-        productdescription,
-        productbrand)
-        VALUES(?,?,?,?,?,?)`
+app.post("/createblog",async(request,response)=>{
+    const{blogid,blogname,blogdescription}=request.body
+    const query=`INSERT INTO blogs(
+        blogtid,
+        blogname,
+        blogdescription)
+        VALUES(?,?,?)`
     try{
-        await db.run(query, [productid,productname,productimg,productprice,productdescription,productbrand]);
-        response.status(200).send("productcreatedsuccessfully");
+        await db.run(query, [blogid,blogname,blogdescription]);
+        response.status(200).send("blogcreatedsuccessfully");
     }catch (error){
         console.error("Error creating user:", error);
         response.status(500).send("Internal Server Error");
@@ -150,13 +144,13 @@ app.post("/createproduct",async(request,response)=>{
     }
 })
 
-app.post("/singleproduct/",async(request,response)=>{
+app.post("/singleblog/",async(request,response)=>{
     const{id}=request.body 
     const onname=JSON.stringify(id)
     console.log(id)
     console.log(onname)
     //console.log(name)
-    const query=`SELECT * FROM products WHERE productid=${onname}`
+    const query=`SELECT * FROM blogs WHERE blogid=${onname}`
     try{
         const data=await db.all(query)
         console.log(data)
@@ -170,14 +164,14 @@ app.post("/singleproduct/",async(request,response)=>{
     
 
 })
-app.post("/deleteproduct/",async(request,response)=>{
+app.post("/deleteblog/",async(request,response)=>{
     const{id}=request.body
     const onname=JSON.stringify(id)
     //console.log(id)
     //console.log(onname)
     
     //console.log(onname)
-    const query=`DELETE FROM products WHERE productid=${onname}`
+    const query=`DELETE FROM blogs WHERE blogtid=${onname}`
     try{
         const okk=await db.run(query)
         //console.log(okk)
